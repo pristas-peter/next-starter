@@ -1,15 +1,95 @@
 {
-  "name": "next-bootstrap",
+  "name": "next-starter",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "is-ci test:ci test:watch",
+    "test:ci": "jest --ci --passWithNoTests --reporters=default --reporters=jest-junit --coverage",
+    "test:watch": "jest --watch",
+    "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --watch",
+    "cy:run": "cypress run  --reporter junit --reporter-options mochaFile=./test-reports/cypress.xml",
+    "cy:open": "cypress open",
+    "test:e2e": "is-ci test:e2e:ci test:e2e:dev",
+    "test:e2e:ci": "start-server-and-test dev 3000 cy:run",
+    "test:e2e:coverage": "nyc report --reporter=text-summary",
+    "test:e2e:dev": "cy:open",
+    "tests:coverage:ci": "mkdir -p coverage/all && lcov -a coverage/cypress/lcov.info -a coverage/jest/lcov.info -o coverage/all/lcov.info",
+    "tests:coverage": "mkdir -p coverage/all && lcov -a coverage/cypress/lcov.info -a coverage/jest/lcov.info -o coverage/all/lcov.info && genHtml coverage/all/lcov.info -o coverage/all/lcov-report",
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|tsx|json|css|html|md)\"",
+    "lint": "eslint . --ext ts --ext tsx --ext js",
+    "type-check": "tsc --pretty --noEmit",
+    "validate": "npm-run-all lint build test:ci test:e2e:ci tests:coverage"
+  },
+  "jest-junit": {
+    "outputDirectory": "./test-reports",
+    "outputName": "jest.xml"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn type-check"
+    }
+  },
+  "lint-staged": {
+    "*.@(js|ts|tsx)": [
+      "yarn lint",
+      "yarn format",
+      "jest --findRelatedTests"
+    ]
+  },
+  "nyc": {
+    "report-dir": "coverage/cypress",
+    "exclude": [
+      "pages/api/__coverage__.js"
+    ]
   },
   "dependencies": {
     "next": "10.1.3",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "styled-components": "^5.2.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.13.8",
+    "@cypress/code-coverage": "3.9.4",
+    "@testing-library/cypress": "^7.0.4",
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^11.1.1",
+    "@testing-library/react-hooks": "^5.1.0",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^14.14.6",
+    "@types/react": "^17.0.2",
+    "@types/styled-components": "^5.1.4",
+    "@typescript-eslint/eslint-plugin": "^4.6.1",
+    "@typescript-eslint/parser": "^4.6.1",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.6.3",
+    "babel-plugin-styled-components": "^1.11.1",
+    "check-code-coverage": "1.10.0",
+    "cypress": "7.0.1",
+    "eslint": "^7.13.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-filenames": "^1.3.2",
+    "eslint-plugin-jest": "^24.1.0",
+    "eslint-plugin-jsdoc": "^32.2.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "^6.0.0",
+    "identity-obj-proxy": "^3.0.0",
+    "is-ci-cli": "^2.1.2",
+    "jest": "^26.6.3",
+    "jest-junit": "^12.0.0",
+    "jest-styled-components": "^7.0.3",
+    "jest-watch-typeahead": "^0.6.1",
+    "lint-staged": "^10.5.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.0.2",
+    "react-is": "^17.0.2",
+    "start-server-and-test": "1.12.1",
+    "typescript": "^4.1.5"
   }
 }
